@@ -6,8 +6,8 @@ Pod::Spec.new do |s|
   s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = { "Thibault Charbonnier" => "thibaultcha@me.com" }
 
-  s.ios.deployment_target = "8.0"
-  s.osx.deployment_target = "10.9"
+  s.ios.deployment_target = "11.0"
+  s.osx.deployment_target = "10.13"
 
   s.source       = {
     :git => "https://github.com/thibaultCha/TCBlobDownloadSwift.git",
