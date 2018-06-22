@@ -17,6 +17,7 @@ public let kTCBlobDownloadErrorFailingURLKey = "TCBlobDownloadFailingURLKey"
 
 public enum TCBlobDownloadError: Int {
     case tcBlobDownloadHTTPError = 1
+    case tcBlobDownloadFileError
 }
 
 open class TCBlobDownloadManager {
@@ -227,11 +228,34 @@ class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
                 if FileManager.default.fileExists(atPath: download.destinationURL.path) {
                     try FileManager.default.replaceItem(at: download.destinationURL as URL, withItemAt: location, backupItemName: nil, options: [], resultingItemURL: &resultingURL)
                 } else {
+                    // Check if the parent directory exists already and create it if needed
+                    var isDir : ObjCBool = false
+                    let parentDirectory = download.destinationURL.deletingLastPathComponent()
+                    let exists = FileManager.default.fileExists(atPath: parentDirectory.path, isDirectory: &isDir)
+                    if (!exists) {
+                        try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true, attributes: nil)
+                    } else if (isDir.boolValue == false) {
+                        let errorString = "Cannot download to \(download.destinationURL) because that path is not a directory"
+                        print(errorString)
+                        throw NSError(domain: kTCBlobDownloadErrorDomain,
+                                      code: TCBlobDownloadError.tcBlobDownloadFileError.rawValue,
+                                        userInfo: [kTCBlobDownloadErrorDescriptionKey: errorString,
+                                            kTCBlobDownloadErrorFailingURLKey: downloadTask.originalRequest!.url!])
+                    }
+                 
+                    // Move the file into place
                     try FileManager.default.moveItem(at: location, to: download.destinationURL as URL)
                 }
                 download.resultingURL = resultingURL as URL? ?? download.destinationURL
             } catch let error as NSError {
                 download.error = error
+            }
+        } else {
+            do {
+                try FileManager.default.removeItem(at: location)
+            }
+            catch let error as NSError {
+                print(error.description)
             }
         }
     }
