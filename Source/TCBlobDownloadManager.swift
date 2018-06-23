@@ -20,7 +20,7 @@ public enum TCBlobDownloadError: Int {
     case tcBlobDownloadFileError
 }
 
-open class TCBlobDownloadManager {
+@objc open class TCBlobDownloadManager : NSObject {
     /**
      A shared instance of `TCBlobDownloadManager`.
      */
@@ -58,7 +58,7 @@ open class TCBlobDownloadManager {
     /**
      Default `NSURLSessionConfiguration` init.
      */
-    public convenience init() {
+    public convenience override init() {
         let config = URLSessionConfiguration.default
         //config.HTTPMaximumConnectionsPerHost = 1
         self.init(config: config)
@@ -185,7 +185,7 @@ open class TCBlobDownloadManager {
 }
 
 
-class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
+@objc class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
     
     var downloads: [Int: TCBlobDownload] = [:]
     let acceptableStatusCodes: CountableRange<Int> = 200..<300

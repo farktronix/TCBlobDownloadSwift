@@ -11,7 +11,7 @@ import Foundation
 public typealias progressionHandler = ((_ progress: Float, _ totalBytesWritten: Int64, _ totalBytesExpectedToWrite: Int64) -> Void)
 public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> Void)
 
-open class TCBlobDownload {
+@objc open class TCBlobDownload : NSObject {
     /// The underlying download task.
     open let downloadTask: URLSessionDownloadTask
 
@@ -131,7 +131,7 @@ open class TCBlobDownload {
     // TODO: instanciable TCBlobDownloads
 }
 
-public protocol TCBlobDownloadDelegate: class {
+@objc public protocol TCBlobDownloadDelegate: class {
     /**
         Periodically informs the delegate that a chunk of data has been received (similar to `NSURLSession -URLSession:dataTask:didReceiveData:`).
     
@@ -158,8 +158,8 @@ public protocol TCBlobDownloadDelegate: class {
 
 // MARK: Printable
 
-extension TCBlobDownload: CustomStringConvertible {
-    public var description: String {
+extension TCBlobDownload {
+    override open var description: String {
         var parts: [String] = []
         var state: String
         
