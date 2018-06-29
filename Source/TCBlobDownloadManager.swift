@@ -24,18 +24,18 @@ public enum TCBlobDownloadError: Int {
     /**
      A shared instance of `TCBlobDownloadManager`.
      */
-    open static let sharedInstance = TCBlobDownloadManager()
+    @objc open static let sharedInstance = TCBlobDownloadManager()
     
     /// Instance of the underlying class implementing `NSURLSessionDownloadDelegate`.
     fileprivate let delegate: DownloadDelegate
     
     /// If `true`, downloads will start immediatly after being created. `true` by default.
-    open var startImmediatly = true
+    @objc open var startImmediatly = true
     
     /// The underlying `NSURLSession`.
-    open let session: URLSession
+    @objc open let session: URLSession
     
-    open var allowRedirection: Bool {
+    @objc open var allowRedirection: Bool {
         set {
             self.delegate.allowRedirection = newValue
         }
@@ -49,7 +49,7 @@ public enum TCBlobDownloadError: Int {
      
      - parameter config: The configuration used to manage the underlying session.
      */
-    public init(config: URLSessionConfiguration) {
+    @objc public init(config: URLSessionConfiguration) {
         self.delegate = DownloadDelegate()
         self.session = URLSession(configuration: config, delegate: self.delegate, delegateQueue: nil)
         self.session.sessionDescription = "TCBlobDownloadManger session"
@@ -58,7 +58,7 @@ public enum TCBlobDownloadError: Int {
     /**
      Default `NSURLSessionConfiguration` init.
      */
-    public convenience override init() {
+    @objc public convenience override init() {
         let config = URLSessionConfiguration.default
         //config.HTTPMaximumConnectionsPerHost = 1
         self.init(config: config)
@@ -89,7 +89,7 @@ public enum TCBlobDownloadError: Int {
      
      :return: A `TCBlobDownload` instance.
      */
-    open func downloadFileWithRequest(_ request: URLRequest, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
+    @objc open func downloadFileWithRequest(_ request: URLRequest, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
         let downloadTask = self.session.downloadTask(with: request)
         let download = TCBlobDownload(downloadTask: downloadTask, toDirectory: directory, fileName: name, delegate: delegate)
         
@@ -106,7 +106,7 @@ public enum TCBlobDownloadError: Int {
      
      :return: A `TCBlobDownload` instance.
      */
-    open func downloadFileAtURL(_ url: URL, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
+    @objc open func downloadFileAtURL(_ url: URL, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
         return downloadFileWithRequest(URLRequest(url: url), toDirectory: directory, withName: name, andDelegate: delegate)
     }
     
@@ -121,7 +121,7 @@ public enum TCBlobDownloadError: Int {
      
      :return: A `TCBlobDownload` instance.
      */
-    open func downloadFileWithRequest(_ request: URLRequest, toDirectory directory: URL?, withName name: String?, progression: progressionHandler?, completion: completionHandler?) -> TCBlobDownload {
+    @objc open func downloadFileWithRequest(_ request: URLRequest, toDirectory directory: URL?, withName name: String?, progression: progressionHandler?, completion: completionHandler?) -> TCBlobDownload {
         let downloadTask = self.session.downloadTask(with: request)
         let download = TCBlobDownload(downloadTask: downloadTask, toDirectory: directory, fileName: name, progression: progression, completion: completion)
         
@@ -139,7 +139,7 @@ public enum TCBlobDownloadError: Int {
      
      :return: A `TCBlobDownload` instance.
      */
-    open func downloadFileAtURL(_ url: URL, toDirectory directory: URL?, withName name: String?, progression: progressionHandler?, completion: completionHandler?) -> TCBlobDownload {
+    @objc open func downloadFileAtURL(_ url: URL, toDirectory directory: URL?, withName name: String?, progression: progressionHandler?, completion: completionHandler?) -> TCBlobDownload {
         return downloadFileWithRequest(URLRequest(url: url), toDirectory: directory, withName: name, progression: progression, completion: completion)
     }
     
@@ -156,7 +156,7 @@ public enum TCBlobDownloadError: Int {
      
      :return: A `TCBlobDownload` instance.
      */
-    open func downloadFileWithResumeData(_ resumeData: Data, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
+    @objc open func downloadFileWithResumeData(_ resumeData: Data, toDirectory directory: URL?, withName name: String?, andDelegate delegate: TCBlobDownloadDelegate?) -> TCBlobDownload {
         let downloadTask = self.session.downloadTask(withResumeData: resumeData)
         let download = TCBlobDownload(downloadTask: downloadTask, toDirectory: directory, fileName: name, delegate: delegate)
         
@@ -187,25 +187,25 @@ public enum TCBlobDownloadError: Int {
 
 @objc class DownloadDelegate: NSObject, URLSessionDownloadDelegate {
     
-    var downloads: [Int: TCBlobDownload] = [:]
+    @objc var downloads: [Int: TCBlobDownload] = [:]
     let acceptableStatusCodes: CountableRange<Int> = 200..<300
-    var allowRedirection = false
+    @objc var allowRedirection = false
     
-    func validateResponse(_ response: HTTPURLResponse) -> Bool {
+    @objc func validateResponse(_ response: HTTPURLResponse) -> Bool {
         return self.acceptableStatusCodes.contains(response.statusCode)
     }
     
     // MARK: NSURLSessionDownloadDelegate
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+    @objc func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         completionHandler(self.allowRedirection ? request : nil)
     }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
+    @objc func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
         print("Resume at offset: \(fileOffset) total expected: \(expectedTotalBytes)")
     }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+    @objc func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         if let download = self.downloads[downloadTask.taskIdentifier] {
             let progress = totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown ? -1 : Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
             
@@ -221,7 +221,7 @@ public enum TCBlobDownloadError: Int {
         }
     }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    @objc func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         if let download = self.downloads[downloadTask.taskIdentifier] {
             do {
                 var resultingURL: NSURL?
@@ -260,7 +260,7 @@ public enum TCBlobDownloadError: Int {
         }
     }
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError sessionError: Error?) {
+    @objc func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError sessionError: Error?) {
         if let download = self.downloads[task.taskIdentifier] {
             var error: NSError? = sessionError as NSError?? ?? download.error
             // Handle possible HTTP errors

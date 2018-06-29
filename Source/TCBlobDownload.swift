@@ -13,16 +13,16 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
 
 @objc open class TCBlobDownload : NSObject {
     /// The underlying download task.
-    open let downloadTask: URLSessionDownloadTask
+    @objc open let downloadTask: URLSessionDownloadTask
 
     /// An optional delegate to get notified of events.
-    open weak var delegate: TCBlobDownloadDelegate?
+    @objc open weak var delegate: TCBlobDownloadDelegate?
 
     /// An optional progression closure periodically executed when a chunk of data has been received.
-    open var progression: progressionHandler?
+    @objc open var progression: progressionHandler?
 
     /// An optional completion closure executed when a download was completed by the download task.
-    open var completion: completionHandler?
+    @objc open var completion: completionHandler?
 
     /// An optional file name set by the user.
     fileprivate let preferedFileName: String?
@@ -31,27 +31,27 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
     fileprivate let directory: URL?
 
     /// Will contain an error if the downloaded file couldn't be moved to its final destination.
-    var error: NSError?
+    @objc var error: NSError?
 
     /// Current progress of the download, a value between 0 and 1. 0 means nothing was received and 1 means the download is completed. If expected size if unknown value equals -1
-    open var progress: Float = 0
+    @objc open var progress: Float = 0
     
     /// Current progress of the download, bytes of downloaded part
-    open var totalBytesWritten: Int64 = 0
+    @objc open var totalBytesWritten: Int64 = 0
     
     /// Current progress of the download, whole size in bytes. If expected size if unknown value equals -1
-    open var totalBytesExpectedToWrite: Int64 = 0
+    @objc open var totalBytesExpectedToWrite: Int64 = 0
 
     /// If the moving of the file after downloading was successful, will contain the `NSURL` pointing to the final file.
-    open var resultingURL: URL?
+    @objc open var resultingURL: URL?
 
     /// A computed property to get the filename of the downloaded file.
-    open var fileName: String? {
+    @objc open var fileName: String? {
         return self.preferedFileName ?? self.downloadTask.response?.suggestedFilename
     }
 
     /// A computed destination URL depending on the `destinationPath`, `fileName`, and `suggestedFileName` from the underlying `NSURLResponse`.
-    open var destinationURL: URL {
+    @objc open var destinationURL: URL {
         let destinationPath = self.directory ?? URL(fileURLWithPath: NSTemporaryDirectory())
         return destinationPath.appendingPathComponent(self.fileName!)
     }
@@ -64,7 +64,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
         - parameter fileName: The preferred file name once the download is completed.
         - parameter delegate: An optional delegate for this download.
     */
-    init(downloadTask: URLSessionDownloadTask, toDirectory directory: URL?, fileName: String?, delegate: TCBlobDownloadDelegate?) {
+    @objc init(downloadTask: URLSessionDownloadTask, toDirectory directory: URL?, fileName: String?, delegate: TCBlobDownloadDelegate?) {
         self.downloadTask = downloadTask
         self.directory = directory
         self.preferedFileName = fileName
@@ -74,7 +74,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
     /**
         
     */
-    convenience init(downloadTask: URLSessionDownloadTask, toDirectory directory: URL?, fileName: String?, progression: progressionHandler?, completion: completionHandler?) {
+    @objc convenience init(downloadTask: URLSessionDownloadTask, toDirectory directory: URL?, fileName: String?, progression: progressionHandler?, completion: completionHandler?) {
         self.init(downloadTask: downloadTask, toDirectory: directory, fileName: fileName, delegate: nil)
         self.progression = progression
         self.completion = completion
@@ -85,7 +85,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
     
         :see: `NSURLSessionDownloadTask -cancel`
     */
-    open func cancel() {
+    @objc open func cancel() {
         self.downloadTask.cancel()
     }
 
@@ -95,7 +95,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
         :see: `TCBlobDownload -resume`
         :see: `NSURLSessionDownloadTask -suspend`
     */
-    open func suspend() {
+    @objc open func suspend() {
         self.downloadTask.suspend()
     }
 
@@ -104,14 +104,14 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
     
         :see: `NSURLSessionDownloadTask -resume`
     */
-    open func resume() {
+    @objc open func resume() {
         self.downloadTask.resume()
     }
     
     /**
         Convinience method
     */
-    open var isSuspended: Bool {
+    @objc open var isSuspended: Bool {
         return self.downloadTask.state == .suspended
     }
 
@@ -123,7 +123,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
 
         - parameter completionHandler: A completion handler that is called when the download has been successfully canceled. If the download is resumable, the completion handler is provided with a resumeData object.
     */
-    open func cancelWithResumeData(_ completionHandler: @escaping (Data?) -> Void) {
+    @objc open func cancelWithResumeData(_ completionHandler: @escaping (Data?) -> Void) {
         self.downloadTask.cancel(byProducingResumeData: completionHandler)
     }
 
@@ -142,7 +142,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
         - parameter totalBytesWritten: The total number of bytes the download has currently written to the disk.
         - parameter totalBytesExpectedToWrite: The total number of bytes the download will write to the disk once completed.
     */
-    func download(_ download: TCBlobDownload, didProgress progress: Float, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64)
+    @objc func download(_ download: TCBlobDownload, didProgress progress: Float, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64)
 
     /**
         Informs the delegate that the download was completed (similar to `NSURLSession -URLSession:task:didCompleteWithError:`).
@@ -153,7 +153,7 @@ public typealias completionHandler = ((_ error: NSError?, _ location: URL?) -> V
         - parameter error: An eventual error. If `nil`, consider the download as being successful.
         - parameter location: The location where the downloaded file can be found.
     */
-    func download(_ download: TCBlobDownload, didFinishWithError error: NSError?, atLocation location: URL?)
+    @objc func download(_ download: TCBlobDownload, didFinishWithError error: NSError?, atLocation location: URL?)
 }
 
 // MARK: Printable
